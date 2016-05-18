@@ -1,0 +1,36 @@
+{
+  "name": "breeze-json-api",
+  "version": "0.0.1",
+  "description": "Adapter for BreezeJS to talk to a JSON-API",
+  "main": "index.js",
+  "scripts": {
+    "test": "test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheHandsomeCoder/breeze-json-api.git"
+  },
+  "keywords": [
+    "BreezeJS"
+  ],
+  "author": "Scott O'Malley",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TheHandsomeCoder/breeze-json-api/issues"
+  },
+  "homepage": "https://github.com/TheHandsomeCoder/breeze-json-api#readme",
+  "devDependencies": {
+    "breeze-client": "^1.5.6",
+    "chai": "^3.5.0",
+    "karma": "^0.13.22",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^1.0.1",
+    "karma-mocha": "^1.0.1",
+    "karma-mocha-reporter": "^2.0.3",
+    "karma-phantomjs-launcher": "^1.0.0",
+    "mocha": "^2.4.5",
+    "phantomjs": "^2.1.7",
+    "phantomjs-prebuilt": "^2.1.7",
+    "q": "^1.4.1"
+  }
+}
