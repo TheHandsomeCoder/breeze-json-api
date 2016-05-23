@@ -3,7 +3,7 @@ describe('breeze-json-api-uribuilder', function() {
 	let uriBuilder = {};
 	let manager = {};
 
-	let executeQuery = function(query){
+	let executeQuery = function(query) {
 		return uriBuilder.buildUri(query, manager.metadataStore)
 	}
 
@@ -29,7 +29,7 @@ describe('breeze-json-api-uribuilder', function() {
 			const expectedURI = 'persons';
 			const query = new breeze.EntityQuery().from("persons");
 
-			expect(executeQuery(query), 'Get all Persons').equal(expectedURI);			
+			expect(executeQuery(query), 'Get all Persons').equal(expectedURI);
 		});
 	});
 
@@ -39,7 +39,16 @@ describe('breeze-json-api-uribuilder', function() {
 			const expectedURI = 'persons/12345';
 			const query = new breeze.EntityQuery().from("persons").where("ID", "==", "12345");
 
-			expect(executeQuery(query), "Get specific person").equal(expectedURI);					
+			expect(executeQuery(query), "Get specific person").equal(expectedURI);
+		});
+	});
+
+	describe('breeze.EntityQuery().from("persons").where("name", "startsWith", "A")', function() {
+		it('should throw an error: startsWith isnt supported', function() {
+
+			const query = new breeze.EntityQuery().from("persons").where('name', 'startsWith', 'A');
+			expect(executeQuery(query)).to.throw(new Error('startsWith is not supported by JSON-API'));
+
 		});
 	});
 
