@@ -1,9 +1,9 @@
 describe('breeze-json-api-uribuilder', function() {
 
-	let uriBuilder = {};
-	let manager = {};
+	var uriBuilder = {};
+	var manager = {};
 
-	let executeQuery = function(query) {
+	var executeQuery = function(query) {
 		return uriBuilder.buildUri(query, manager.metadataStore)
 	}
 
