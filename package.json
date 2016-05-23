@@ -18,6 +18,12 @@
   "bugs": {
     "url": "https://github.com/TheHandsomeCoder/breeze-json-api/issues"
   },
+  "eslintConfig": {
+    "env": {
+      "es6": true,
+      "node": true
+    }
+  },
   "homepage": "https://github.com/TheHandsomeCoder/breeze-json-api#readme",
   "devDependencies": {
     "breeze-client": "^1.5.6",
