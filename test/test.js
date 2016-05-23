@@ -7,7 +7,6 @@ describe('breeze-json-api-uribuilder', function() {
 		return uriBuilder.buildUri(query, manager.metadataStore)
 	}
 
-
 	before(function() {
 		breeze.config.initializeAdapterInstances({
 			uriBuilder: "json-api"
