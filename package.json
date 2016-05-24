@@ -4,7 +4,7 @@
   "description": "Adapter for BreezeJS to talk to a JSON-API",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha --require coffee-script/register --compilers coffee:coffee-script/register test/*.coffee --timeout 30000"
+    "test": "./node_modules/.bin/mocha --require coffee-script/register --compilers coffee:coffee-script/register test/*.coffee -bail --timeout 30000"
   },
   "repository": {
     "type": "git",

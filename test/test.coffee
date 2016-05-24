@@ -36,8 +36,21 @@ describe "005. Basic query building", ->
 			it '"name startsWith A" to throw unsupperted operator exception', -> expect(buildUri(query.where('name','startsWith', 'A'))).to.throw(Error('an error'))
 			it '"name in [Raynor,LiLi]" returns people?filter[name]=Raynor,LiLi', -> expect(buildUri(query.where('name','in', ['Raynor','LiLi']))).to.equal('people?filter[name]=Raynor,LiLi')
 
-		describe 'orderBy', ->
-			it '"orderBy \'firstName\'" returns "people?sort=firstName"', -> expect(buildUri(query.orderBy('firstName'))).to.equal('people?sort=firstName')
-			it '"orderBy \'firstName desc\'" returns "people?sort=-firstName"', -> expect(buildUri(query.orderBy('firstName desc'))).to.equal('people?sort=-firstName')
-			it '"orderBy \'firstName desc\', false" returns "people?sort=firstName"', -> expect(buildUri(query.orderBy('firstName desc', false))).to.equal('people?sort=firstName')
-			it '"orderBy \'firstName\', true" returns "people?sort=-firstName"', -> expect(buildUri(query.orderBy('firstName'))).to.equal('people?sort=-firstName')
+		describe 'orderBy single', ->
+			it '"firstName" returns "people?sort=firstName"', -> expect(buildUri(query.orderBy('firstName'))).to.equal('people?sort=firstName')
+			it '"firstName desc" returns "people?sort=-firstName"', -> expect(buildUri(query.orderBy('firstName desc'))).to.equal('people?sort=-firstName')
+			it '"firstName desc", false" returns "people?sort=firstName"', -> expect(buildUri(query.orderBy('firstName desc', false))).to.equal('people?sort=firstName')
+			it '"firstName, true" returns "people?sort=-firstName"', -> expect(buildUri(query.orderBy('firstName'))).to.equal('people?sort=-firstName')
+		
+		describe 'orderBy multiple', ->
+			it '"firstName, lastName" returns "people?sort=firstName,lastName"', -> expect(buildUri(query.orderBy('firstName, lastName'))).to.equal('people?sort=firstName,lastName')
+			it '"firstName desc, lastName" returns "people?sort=-firstName,lastName"', -> expect(buildUri(query.orderBy('firstName desc, lastName'))).to.equal('people?sort=-firstName,lastName')
+			it '"firstName , lastName desc" returns "people?sort=firstName,-lastName"', -> expect(buildUri(query.orderBy('firstName, lastName'))).to.equal('people?sort=firstName,-lastName')
+			it '"firstName desc, lastName desc" returns "people?sort=-firstName,-lastName"', -> expect(buildUri(query.orderBy('firstName desc, lastName desc'))).to.equal('people?sort=-firstName,-lastName')
+			it '"firstName desc, lastName desc", false returns "people?sort=firstName,lastName"', -> expect(buildUri(query.orderBy('firstName desc, lastName desc', false))).to.equal('people?sort=firstName,lastName')
+			it '"firstName, lastName", true returns "people?sort=-firstName,-lastName"', -> expect(buildUri(query.orderBy('firstName, lastName', true))).to.equal('people?sort=-firstName,-lastName')
+
+
+
+
+
