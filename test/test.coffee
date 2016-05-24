@@ -7,7 +7,6 @@ require('../src/breeze-json-api-uribuilder.js')
 expect = require('chai').expect
 
 
-
 describe "000.Init", ->	
 	it "should not be null", -> expect(breeze).to.not.be.null		
 
@@ -33,4 +32,9 @@ describe "005. Basic query building", ->
 		describe 'where', ->
 			it 'unset returns "persons"', -> expect(buildUri(query)).to.equal('persons') 
 			it '"name == Scott" returns "persons?filter[name]=Scott"', -> expect(buildUri(query.where("name", "==", "Scott"))).to.equal('persons?filter[name]=Scott') 
-			
+			it '"id == 55555" returns "persons/55555"', -> expect(buildUri(query.where("id", "==", "55555"))).to.equal('persons/55555')
+			it '"name startsWith A" to throw unsupperted operator exception', -> expect(buildUri(query.where('name','startsWith', 'A'))).to.throw(Error('an error'))
+
+
+
+
