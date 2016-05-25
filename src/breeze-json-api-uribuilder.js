@@ -29,8 +29,8 @@
         }
 
         var queryOptions = {};
-        queryOptions["$filter"] = toWhereODataFragment(entityQuery.wherePredicate);
-        queryOptions["$orderby"] = toOrderByODataFragment(entityQuery.orderByClause);
+        queryOptions["filter"] = toWhereODataFragment(entityQuery.wherePredicate);
+        queryOptions["sort"] = toOrderFragment(entityQuery.orderByClause);
 
         if (entityQuery.skipCount) {
             queryOptions["$skip"] = entityQuery.skipCount;
@@ -58,11 +58,11 @@
             return wherePredicate.visit({ entityType: entityType}, toODataFragmentVisitor );
         }
 
-        function toOrderByODataFragment(orderByClause) {
+        function toOrderFragment(orderByClause) {
             if (!orderByClause) return undefined;
             orderByClause.validate(entityType);
             var strings = orderByClause.items.map(function (item) {
-                return entityType.clientPropertyPathToServer(item.propertyPath, "/") + (item.isDesc ? " desc" : "");
+                return (item.isDesc ? "-" : "") + entityType.clientPropertyPathToServer(item.propertyPath, "/");
             });
             // should return something like CompanyName,Address/City desc
             return strings.join(',');
@@ -92,7 +92,11 @@
             for (var qoName in queryOptions) {
                 var qoValue = queryOptions[qoName];
                 if (qoValue !== undefined) {
-                    if (qoValue instanceof Array) {
+                    if(qoName === 'filter'){
+                        qoValue.forEach(function(filter){
+                            qoStrings.push(encodeURI(filter))
+                        })
+                    } else if (qoValue instanceof Array) {
                         qoValue.forEach(function (qov) {
                             qoStrings.push(qoName + "=" + encodeURIComponent(qov));
                         });
@@ -148,7 +152,8 @@
                         return odataOp + "(" + expr1Val + "," + expr2Val + ") eq true";
                     }
                 } else {
-                    return expr1Val + " " + odataOp + " " + expr2Val;
+                    return `filter[${expr1Val}]=${expr2Val}`;
+                    //return expr1Val + " " + odataOp + " " + expr2Val;
                 }
             },
 
@@ -179,9 +184,9 @@
 
             litExpr: function () {
                 if (Array.isArray(this.value)) {
-                    return this.value.map(function(v) { return this.dataType.fmtOData(v)}, this);
+                    return this.value.map(function(v) {return v}, this);
                 } else {
-                    return this.dataType.fmtOData(this.value);
+                    return this.value;
                 }
             },
 
