@@ -29,6 +29,7 @@
         }
 
         var queryOptions = {};
+        var entitiyID = getEntityIDFromWhereFragment(entityQuery.wherePredicate);
         queryOptions["filter"] = toWhereODataFragment(entityQuery.wherePredicate);
         queryOptions["sort"] = toOrderFragment(entityQuery.orderByClause);
 
@@ -48,9 +49,18 @@
         }
 
         var qoText = toQueryOptionsString(queryOptions);
-        return entityQuery.resourceName + qoText;
+        return entityQuery.resourceName + ((entitiyID) ? '/'+ entitiyID : '') + qoText
 
         // private methods to this func.
+        function getEntityIDFromWhereFragment(wherePredicate) {
+            if (!wherePredicate || wherePredicate.preds) return undefined;
+            // validation occurs inside of the toODataFragment call here.
+            if(wherePredicate.expr1Source.toUpperCase() === 'ID'){
+                return wherePredicate.expr2Source
+            } else{
+                return undefined;
+            }
+        }
 
         function toWhereODataFragment(wherePredicate) {
             if (!wherePredicate) return undefined;
@@ -92,10 +102,8 @@
             for (var qoName in queryOptions) {
                 var qoValue = queryOptions[qoName];
                 if (qoValue !== undefined) {
-                    if(qoName === 'filter'){
-                        qoValue.forEach(function(filter){
-                            qoStrings.push(encodeURI(filter))
-                        })
+                    if(qoName === 'filter') {
+                        qoStrings.push(encodeURI(qoValue));
                     } else if (qoValue instanceof Array) {
                         qoValue.forEach(function (qov) {
                             qoStrings.push(qoName + "=" + encodeURIComponent(qov));
@@ -116,7 +124,7 @@
 
     breeze.Predicate.prototype.toODataFragment = function(context) {
         return this.visit( context, toODataFragmentVisitor);
-    }
+    };
 
     toODataFragmentVisitor = (function () {
         var visitor = {
@@ -139,12 +147,12 @@
                 }
 
                 var odataOp = odataOpFrom(this);
-
+                if(expr1Val.toUpperCase() === 'ID') return;
                 if (this.op.key === 'in') {
                     var result = expr2Val.map(function (v) {
-                        return "(" + expr1Val + " eq " + v + ")";
-                    }).join(" or ");
-                    return result;
+                        return v;
+                    }).join(",");
+                    return `filter[${expr1Val}]=${result}`;
                 } else if (this.op.isFunction) {
                     if (odataOp === "substringof") {
                         return odataOp + "(" + expr2Val + "," + expr1Val + ") eq true";
@@ -152,6 +160,7 @@
                         return odataOp + "(" + expr1Val + "," + expr2Val + ") eq true";
                     }
                 } else {
+
                     return `filter[${expr1Val}]=${expr2Val}`;
                     //return expr1Val + " " + odataOp + " " + expr2Val;
                 }
@@ -160,7 +169,7 @@
             andOrPredicate: function (context) {
                 var result = this.preds.map(function (pred) {
                     var predVal = pred.visit(context);
-                    return "(" + predVal + ")";
+                    return predVal;
                 }).join(" " + odataOpFrom(this) + " ");
                 return result;
             },
