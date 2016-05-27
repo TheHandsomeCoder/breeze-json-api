@@ -49,22 +49,22 @@ describe "005. Basic query building", ->
 			it '"id == 55555" returns "people/55555"', -> expect(decodeURIComponent(buildUri(query.where("id", "==", "55555")))).to.equal('people/55555')
 			it '"name in [Raynor,LiLi]" returns people?filter[name]=Raynor,LiLi', -> expect(decodeURIComponent(buildUri(query.where('name','in', ['Raynor','LiLi'])))).to.equal('people?filter[name]=Raynor,LiLi')
 
-			describe 'unsupported operators', ->
-				it '"name startsWith A" to throw unsupported operator exception', -> expect(buildUri(query.where('name','startsWith', 'A'))).to.throw(Error('An error'))
-				it '"name endsWith A" to throw unsupported operator exception', -> expect(buildUri(query.where('name','endsWith', 'A'))).to.throw(Error('An error'))
-				it '"name contains A" to throw unsupported operator exception', -> expect(buildUri(query.where('name','contains', 'A'))).to.throw(Error('An error'))
-				it '"name ne Scott" to throw unsupported operator exception', -> expect(buildUri(query.where('name','ne', 'Scott'))).to.throw(Error('An error'))
-				it '"age gt 20" to throw unsupported operator exception', -> expect(buildUri(query.where('age','gt', 20))).to.throw(Error('An error'))
-				it '"age ge 20" to throw unsupported operator exception', -> expect(buildUri(query.where('age','ge', 20))).to.throw(Error('An error'))
-				it '"age lt 20" to throw unsupported operator exception', -> expect(buildUri(query.where('age','lt', 20))).to.throw(Error('An error'))
-				it '"age le 20" to throw unsupported operator exception', -> expect(buildUri(query.where('age','le', 20))).to.throw(Error('An error'))
+		describe 'unsupported operators', ->
+			it '"name startsWith A" to throw Error', -> expect(buildUri(query.where('name','startsWith', 'A'))).to.throw(new Error())
+			it '"name endsWith A" to throw unsupported operator exception', -> expect(buildUri(query.where('name','endsWith', 'A'))).to.throw(Error('An error'))
+			it '"name contains A" to throw unsupported operator exception', -> expect(buildUri(query.where('name','contains', 'A'))).to.throw(Error('An error'))
+			it '"name ne Scott" to throw unsupported operator exception', -> expect(buildUri(query.where('name','ne', 'Scott'))).to.throw(Error('An error'))
+			it '"age gt 20" to throw unsupported operator exception', -> expect(buildUri(query.where('age','gt', 20))).to.throw(Error('An error'))
+			it '"age ge 20" to throw unsupported operator exception', -> expect(buildUri(query.where('age','ge', 20))).to.throw(Error('An error'))
+			it '"age lt 20" to throw unsupported operator exception', -> expect(buildUri(query.where('age','lt', 20))).to.throw(Error('An error'))
+			it '"age le 20" to throw unsupported operator exception', -> expect(buildUri(query.where('age','le', 20))).to.throw(Error('An error'))
 
 		describe 'Predicates', ->
 			pred = undefined
 			beforeEach ->
 				pred = breeze.Predicate.create('firstName', '==', 'Scott').and(   'lastName', '==', 'Raynor');
 				query.where(pred);
-			it "'firstName', '==', 'Scott' and 'lastName', '==', 'Raynor' returns people?filter[firstName]=Scott&filter[lastName]=Raynor", -> expect(decodeURIComponent(buildUri(query.where(pred)))).to.equal('people?filter[firstName]=Scott&filter[lastName]=Raynor');
+			it.only "'firstName', '==', 'Scott' and 'lastName', '==', 'Raynor' returns people?filter[firstName]=Scott&filter[lastName]=Raynor", -> expect(decodeURIComponent(buildUri(query.where(pred)))).to.equal('people?filter[firstName]=Scott&filter[lastName]=Raynor');
 
 
 

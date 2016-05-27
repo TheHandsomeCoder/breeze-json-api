@@ -1,4 +1,4 @@
-(function (factory) {
+(function(factory) {
     if (typeof breeze === "object") {
         factory(breeze);
     } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
@@ -8,7 +8,7 @@
         // AMD anonymous module with hard-coded dependency on "breeze"
         define(["breeze"], factory);
     }
-}(function (breeze) {
+}(function(breeze) {
     "use strict";
     var EntityType = breeze.EntityType;
     var toODataFragmentVisitor;
@@ -20,7 +20,7 @@
 
     proto.initialize = function() {};
 
-    proto.buildUri = function (entityQuery, metadataStore) {
+    proto.buildUri = function(entityQuery, metadataStore) {
         // force entityType validation;
         var entityType = entityQuery._getFromEntityType(metadataStore, false);
         if (!entityType) {
@@ -49,15 +49,15 @@
         }
 
         var qoText = toQueryOptionsString(queryOptions);
-        return entityQuery.resourceName + ((entitiyID) ? '/'+ entitiyID : '') + qoText
+        return entityQuery.resourceName + ((entitiyID) ? '/' + entitiyID : '') + qoText
 
         // private methods to this func.
         function getEntityIDFromWhereFragment(wherePredicate) {
             if (!wherePredicate || wherePredicate.preds) return undefined;
             // validation occurs inside of the toODataFragment call here.
-            if(wherePredicate.expr1Source.toUpperCase() === 'ID'){
+            if (wherePredicate.expr1Source.toUpperCase() === 'ID') {
                 return wherePredicate.expr2Source
-            } else{
+            } else {
                 return undefined;
             }
         }
@@ -65,13 +65,15 @@
         function toWhereODataFragment(wherePredicate) {
             if (!wherePredicate) return undefined;
             // validation occurs inside of the toODataFragment call here.
-            return wherePredicate.visit({ entityType: entityType}, toODataFragmentVisitor );
+            return wherePredicate.visit({
+                entityType: entityType
+            }, toODataFragmentVisitor);
         }
 
         function toOrderFragment(orderByClause) {
             if (!orderByClause) return undefined;
             orderByClause.validate(entityType);
-            var strings = orderByClause.items.map(function (item) {
+            var strings = orderByClause.items.map(function(item) {
                 return (item.isDesc ? "-" : "") + entityType.clientPropertyPathToServer(item.propertyPath, "/");
             });
             // should return something like CompanyName,Address/City desc
@@ -81,8 +83,8 @@
         function toSelectODataFragment(selectClause) {
             if (!selectClause) return undefined;
             selectClause.validate(entityType);
-            var frag = selectClause.propertyPaths.map(function (pp) {
-                return  entityType.clientPropertyPathToServer(pp, "/");
+            var frag = selectClause.propertyPaths.map(function(pp) {
+                return entityType.clientPropertyPathToServer(pp, "/");
             }).join(",");
             return frag;
         }
@@ -91,7 +93,7 @@
             if (!expandClause) return undefined;
             // no validate on expand clauses currently.
             // expandClause.validate(entityType);
-            var frag = expandClause.propertyPaths.map(function (pp) {
+            var frag = expandClause.propertyPaths.map(function(pp) {
                 return entityType.clientPropertyPathToServer(pp, "/");
             }).join(",");
             return frag;
@@ -102,10 +104,10 @@
             for (var qoName in queryOptions) {
                 var qoValue = queryOptions[qoName];
                 if (qoValue !== undefined) {
-                    if(qoName === 'filter') {
+                    if (qoName === 'filter') {
                         qoStrings.push(encodeURI(qoValue));
                     } else if (qoValue instanceof Array) {
-                        qoValue.forEach(function (qov) {
+                        qoValue.forEach(function(qov) {
                             qoStrings.push(qoName + "=" + encodeURIComponent(qov));
                         });
                     } else {
@@ -123,22 +125,22 @@
     };
 
     breeze.Predicate.prototype.toODataFragment = function(context) {
-        return this.visit( context, toODataFragmentVisitor);
+        return this.visit(context, toODataFragmentVisitor);
     };
 
-    toODataFragmentVisitor = (function () {
+    toODataFragmentVisitor = (function() {
         var visitor = {
 
-            passthruPredicate: function () {
+            passthruPredicate: function() {
                 return this.value;
             },
 
-            unaryPredicate: function (context) {
+            unaryPredicate: function(context) {
                 var predVal = this.pred.visit(context);
                 return odataOpFrom(this) + " " + "(" + predVal + ")";
             },
 
-            binaryPredicate: function (context) {
+            binaryPredicate: function(context) {
                 var expr1Val = this.expr1.visit(context);
                 var expr2Val = this.expr2.visit(context);
                 var prefix = context.prefix;
@@ -146,35 +148,35 @@
                     expr1Val = prefix + "/" + expr1Val;
                 }
 
-                var odataOp = odataOpFrom(this);
-                if(expr1Val.toUpperCase() === 'ID') return;
+                var operator = operatorFrom(this);
+                if (expr1Val.toUpperCase() === 'ID') return;
                 if (this.op.key === 'in') {
-                    var result = expr2Val.map(function (v) {
+                    var result = expr2Val.map(function(v) {
                         return v;
                     }).join(",");
                     return `filter[${expr1Val}]=${result}`;
                 } else if (this.op.isFunction) {
-                    if (odataOp === "substringof") {
-                        return odataOp + "(" + expr2Val + "," + expr1Val + ") eq true";
+                    if (operator === "substringof") {
+                        return operator + "(" + expr2Val + "," + expr1Val + ") eq true";
                     } else {
-                        return odataOp + "(" + expr1Val + "," + expr2Val + ") eq true";
+                        return operator + "(" + expr1Val + "," + expr2Val + ") eq true";
                     }
                 } else {
 
-                    return `filter[${expr1Val}]=${expr2Val}`;
+                    return `filter[${expr1Val}]${operator}${expr2Val}`;
                     //return expr1Val + " " + odataOp + " " + expr2Val;
                 }
             },
 
-            andOrPredicate: function (context) {
-                var result = this.preds.map(function (pred) {
+            andOrPredicate: function(context) {
+                var result = this.preds.map(function(pred) {
                     var predVal = pred.visit(context);
                     return predVal;
                 }).join(" " + odataOpFrom(this) + " ");
                 return result;
             },
 
-            anyAllPredicate: function (context) {
+            anyAllPredicate: function(context) {
                 var exprVal = this.expr.visit(context);
                 var prefix = context.prefix;
                 if (prefix) {
@@ -191,21 +193,23 @@
                 return exprVal + "/" + odataOpFrom(this) + "(" + prefix + ": " + newPredVal + ")";
             },
 
-            litExpr: function () {
+            litExpr: function() {
                 if (Array.isArray(this.value)) {
-                    return this.value.map(function(v) {return v}, this);
+                    return this.value.map(function(v) {
+                        return v
+                    }, this);
                 } else {
                     return this.value;
                 }
             },
 
-            propExpr: function (context) {
+            propExpr: function(context) {
                 var entityType = context.entityType;
                 // '/' is the OData path delimiter
                 return entityType ? entityType.clientPropertyPathToServer(this.propertyPath, "/") : this.propertyPath;
             },
 
-            fnExpr: function (context) {
+            fnExpr: function(context) {
                 var exprVals = this.exprs.map(function(expr) {
                     return expr.visit(context);
                 });
@@ -214,13 +218,19 @@
         };
 
         var _operatorMap = {
-            'contains': 'substringof'
+            'contains': 'substringof',
+            'eq': '=',
+            'in': 'in'
         };
 
-        function odataOpFrom(node) {
-            var op = node.op.key;
-            var odataOp = _operatorMap[op];
-            return odataOp || op;
+        function operatorFrom(node) {
+            var op = _operatorMap[node.op.key];
+            if (!op) {
+                throw new Error();
+            }
+
+            console.log(op);
+            return op
         }
 
         return visitor;
@@ -229,7 +239,3 @@
     breeze.config.registerAdapter("uriBuilder", ctor);
 
 }));
-
-
-
-
