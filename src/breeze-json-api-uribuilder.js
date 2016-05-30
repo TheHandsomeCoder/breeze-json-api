@@ -137,7 +137,7 @@
 
             unaryPredicate: function(context) {
                 var predVal = this.pred.visit(context);
-                return odataOpFrom(this) + " " + "(" + predVal + ")";
+                return operatorFrom(this) + " " + "(" + predVal + ")";
             },
 
             binaryPredicate: function(context) {
@@ -172,7 +172,7 @@
                 var result = this.preds.map(function(pred) {
                     var predVal = pred.visit(context);
                     return predVal;
-                }).join(" " + odataOpFrom(this) + " ");
+                }).join(operatorFrom(this));
                 return result;
             },
 
@@ -190,7 +190,7 @@
                 newContext.entityType = this.expr.dataType;
                 newContext.prefix = prefix;
                 var newPredVal = this.pred.visit(newContext);
-                return exprVal + "/" + odataOpFrom(this) + "(" + prefix + ": " + newPredVal + ")";
+                return exprVal + "/" + operatorFrom(this) + "(" + prefix + ": " + newPredVal + ")";
             },
 
             litExpr: function() {
@@ -220,6 +220,7 @@
         var _operatorMap = {
            // 'contains': 'substringof',
             'eq': '=',
+            'and': '&',
             'in': 'in'
         };
 

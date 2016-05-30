@@ -64,7 +64,7 @@ describe "005. Basic query building", ->
 			beforeEach ->
 				pred = breeze.Predicate.create('firstName', '==', 'Scott').and(   'lastName', '==', 'Raynor');
 				query.where(pred);
-			it.only "'firstName', '==', 'Scott' and 'lastName', '==', 'Raynor' returns people?filter[firstName]=Scott&filter[lastName]=Raynor", -> expect(decodeURIComponent(buildUri(query.where(pred)))).to.equal('people?filter[firstName]=Scott&filter[lastName]=Raynor');
+			it "'firstName', '==', 'Scott' and 'lastName', '==', 'Raynor' returns people?filter[firstName]=Scott&filter[lastName]=Raynor", -> expect(decodeURIComponent(buildUri(query.where(pred)))).to.equal('people?filter[firstName]=Scott&filter[lastName]=Raynor');
 
 
 
