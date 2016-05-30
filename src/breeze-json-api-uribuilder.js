@@ -218,7 +218,7 @@
         };
 
         var _operatorMap = {
-            'contains': 'substringof',
+           // 'contains': 'substringof',
             'eq': '=',
             'in': 'in'
         };
@@ -226,10 +226,9 @@
         function operatorFrom(node) {
             var op = _operatorMap[node.op.key];
             if (!op) {
-                throw new Error();
+                throw new Error(`${node.op.key} is currently not supported by JSON-API`);
             }
 
-            console.log(op);
             return op
         }
 
