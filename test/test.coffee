@@ -75,3 +75,7 @@ describe '015. OrderBy', ->
 				it '"firstName desc, lastName desc", false returns "people?sort=firstName,lastName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName desc, lastName desc', false)))).to.equal('people?sort=firstName,lastName')
 				it '"firstName, lastName", true returns "people?sort=-firstName,-lastName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName, lastName', true)))).to.equal('people?sort=-firstName,-lastName')
 
+describe '030. Expand', ->
+		describe 'expand single', ->
+				it.only 'expand siblings', -> expect(decodeURIComponent(buildUri(query.expand('siblings')))).to.equal('people?include=siblings')
+

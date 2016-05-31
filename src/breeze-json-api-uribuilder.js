@@ -41,7 +41,7 @@
             queryOptions["$top"] = entityQuery.takeCount;
         }
 
-        queryOptions["$expand"] = toExpandODataFragment(entityQuery.expandClause);
+        queryOptions["include"] = toExpandODataFragment(entityQuery.expandClause);
         queryOptions["$select"] = toSelectODataFragment(entityQuery.selectClause);
 
         if (entityQuery.inlineCountEnabled) {
