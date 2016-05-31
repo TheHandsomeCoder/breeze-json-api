@@ -6,43 +6,28 @@ breeze = require('breeze-client')
 require('../src/breeze-json-api-uribuilder.js')
 expect = require('chai').expect
 
+uriBuilder = undefined
+manager = undefined
+query = undefined
+buildUri = (query) -> uriBuilder.buildUri query, manager.metadataStore
 
-describe "000.Init", ->	
-	it "should not be null", -> expect(breeze).to.not.be.null		
+before ->
+	breeze.config.initializeAdapterInstances uriBuilder: 'json-api'
+	ds = new (breeze.DataService)(
+		serviceName: 'http://localhost:9000'
+		hasServerMetadata: false)
+	manager = new (breeze.EntityManager)(dataService: ds)
+	uriBuilder = breeze.config.getAdapterInstance('uriBuilder', 'json-api')
 
+beforeEach -> query = (new (breeze.EntityQuery)).from('people')
+
+describe "000. Init", ->
+	it "should not be null", -> expect(breeze).to.not.be.null
 
 describe "005. Basic query building", ->
-	uriBuilder = undefined
-	manager = undefined
-	query = undefined
-	buildUri = (query) -> uriBuilder.buildUri query, manager.metadataStore
-
 
 	describe 'breeze.EntityQuery().from("people")', ->
-		before ->
-			breeze.config.initializeAdapterInstances uriBuilder: 'json-api'
-			ds = new (breeze.DataService)(
-				serviceName: 'http://localhost:9000'
-				hasServerMetadata: false)
-			manager = new (breeze.EntityManager)(dataService: ds)
-			uriBuilder = breeze.config.getAdapterInstance('uriBuilder', 'json-api')
 
-		beforeEach -> query = (new (breeze.EntityQuery)).from('people')
-
-		describe 'orderBy single', ->
-			it '"firstName" returns "people?sort=firstName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName')))).to.equal('people?sort=firstName')
-			it '"firstName desc" returns "people?sort=-firstName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName desc')))).to.equal('people?sort=-firstName')
-			it '"firstName desc", false" returns "people?sort=firstName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName desc', false)))).to.equal('people?sort=firstName')
-			it '"firstName, true" returns "people?sort=-firstName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName', true)))).to.equal('people?sort=-firstName')
-		
-		describe 'orderBy multiple', ->
-			it '"firstName, lastName" returns "people?sort=firstName,lastName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName, lastName')))).to.equal('people?sort=firstName,lastName')
-			it '"firstName desc, lastName" returns "people?sort=-firstName,lastName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName desc, lastName')))).to.equal('people?sort=-firstName,lastName')
-			it '"firstName, lastName desc" returns "people?sort=firstName,-lastName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName, lastName desc')))).to.equal('people?sort=firstName,-lastName')
-			it '"firstName desc, lastName desc" returns "people?sort=-firstName,-lastName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName desc, lastName desc')))).to.equal('people?sort=-firstName,-lastName')
-			it '"firstName desc, lastName desc", false returns "people?sort=firstName,lastName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName desc, lastName desc', false)))).to.equal('people?sort=firstName,lastName')
-			it '"firstName, lastName", true returns "people?sort=-firstName,-lastName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName, lastName', true)))).to.equal('people?sort=-firstName,-lastName')
-		
 		describe 'where', ->
 			it 'unset returns "people"', -> expect(buildUri(query)).to.equal('people') 
 			it '"name == Scott" returns "people?filter[name]=Scott"', -> expect(decodeURIComponent(buildUri(query.where("name", "==", "Scott")))).to.equal('people?filter[name]=Scott')
@@ -59,12 +44,34 @@ describe "005. Basic query building", ->
 			it '"age lt 20" to throw unsupported operator exception', -> expect( -> buildUri(query.where('age','lt', 20))).to.throw('lt is currently not supported by JSON-API')
 			it '"age le 20" to throw unsupported operator exception', -> expect( -> buildUri(query.where('age','le', 20))).to.throw('le is currently not supported by JSON-API')
 
+describe "010. Advanced query building", ->
+
 		describe 'Predicates', ->
 
-			andPredicate = breeze.Predicate.create('firstName', '==', 'Scott').and(   'lastName', '==', 'Raynor');
-			it "'firstName', '==', 'Scott' and 'lastName', '==', 'Raynor' returns people?filter[firstName]=Scott&filter[lastName]=Raynor", -> expect(decodeURIComponent(buildUri(query.where(andPredicate)))).to.equal('people?filter[firstName]=Scott&filter[lastName]=Raynor');
+				andPredicate = breeze.Predicate.create('firstName', '==', 'Scott').and(   'lastName', '==', 'Raynor');
+				it "'firstName', '==', 'Scott' AND 'lastName', '==', 'Raynor' returns people?filter[firstName]=Scott&filter[lastName]=Raynor", -> expect(decodeURIComponent(buildUri(query.where(andPredicate)))).to.equal('people?filter[firstName]=Scott&filter[lastName]=Raynor');
 
-			orPredicate = breeze.Predicate.create('firstName', '==', 'Scott').or(   'lastName', '==', 'Raynor');
-			it "'firstName', '==', 'Scott' OR 'lastName', '==', 'Raynor' to throw unsupported operator exception", -> expect( -> buildUri(query.where(orPredicate))).to.throw('or is currently not supported by JSON-API')
+				orPredicate = breeze.Predicate.create('firstName', '==', 'Scott').or(   'lastName', '==', 'Raynor');
+				it "'firstName', '==', 'Scott' OR 'lastName', '==', 'Raynor' to throw unsupported operator exception", -> expect( -> buildUri(query.where(orPredicate))).to.throw('or is currently not supported by JSON-API')
 
+				andOrPredicate = breeze.Predicate.create('firstName', '==', 'Scott').and(   'lastName', '==', 'Raynor').or('age', '==', '25');
+				it "'firstName', '==', 'Scott' AND 'lastName', '==', 'Raynor' or 'age' == '25' to throw unsupported operator exception", -> expect( -> buildUri(query.where(orPredicate))).to.throw('or is currently not supported by JSON-API')
+
+
+
+describe '015. OrderBy', ->
+
+		describe 'orderBy single', ->
+				it '"firstName" returns "people?sort=firstName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName')))).to.equal('people?sort=firstName')
+				it '"firstName desc" returns "people?sort=-firstName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName desc')))).to.equal('people?sort=-firstName')
+				it '"firstName desc", false" returns "people?sort=firstName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName desc', false)))).to.equal('people?sort=firstName')
+				it '"firstName, true" returns "people?sort=-firstName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName', true)))).to.equal('people?sort=-firstName')
+
+		describe 'orderBy multiple', ->
+				it '"firstName, lastName" returns "people?sort=firstName,lastName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName, lastName')))).to.equal('people?sort=firstName,lastName')
+				it '"firstName desc, lastName" returns "people?sort=-firstName,lastName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName desc, lastName')))).to.equal('people?sort=-firstName,lastName')
+				it '"firstName, lastName desc" returns "people?sort=firstName,-lastName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName, lastName desc')))).to.equal('people?sort=firstName,-lastName')
+				it '"firstName desc, lastName desc" returns "people?sort=-firstName,-lastName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName desc, lastName desc')))).to.equal('people?sort=-firstName,-lastName')
+				it '"firstName desc, lastName desc", false returns "people?sort=firstName,lastName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName desc, lastName desc', false)))).to.equal('people?sort=firstName,lastName')
+				it '"firstName, lastName", true returns "people?sort=-firstName,-lastName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName, lastName', true)))).to.equal('people?sort=-firstName,-lastName')
 
