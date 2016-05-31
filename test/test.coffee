@@ -60,11 +60,11 @@ describe "005. Basic query building", ->
 			it '"age le 20" to throw unsupported operator exception', -> expect( -> buildUri(query.where('age','le', 20))).to.throw('le is currently not supported by JSON-API')
 
 		describe 'Predicates', ->
-			pred = undefined
-			beforeEach ->
-				pred = breeze.Predicate.create('firstName', '==', 'Scott').and(   'lastName', '==', 'Raynor');
-				query.where(pred);
-			it "'firstName', '==', 'Scott' and 'lastName', '==', 'Raynor' returns people?filter[firstName]=Scott&filter[lastName]=Raynor", -> expect(decodeURIComponent(buildUri(query.where(pred)))).to.equal('people?filter[firstName]=Scott&filter[lastName]=Raynor');
 
+			andPredicate = breeze.Predicate.create('firstName', '==', 'Scott').and(   'lastName', '==', 'Raynor');
+			it "'firstName', '==', 'Scott' and 'lastName', '==', 'Raynor' returns people?filter[firstName]=Scott&filter[lastName]=Raynor", -> expect(decodeURIComponent(buildUri(query.where(andPredicate)))).to.equal('people?filter[firstName]=Scott&filter[lastName]=Raynor');
+
+			orPredicate = breeze.Predicate.create('firstName', '==', 'Scott').or(   'lastName', '==', 'Raynor');
+			it "'firstName', '==', 'Scott' OR 'lastName', '==', 'Raynor' to throw unsupported operator exception", -> expect( -> buildUri(query.where(orPredicate))).to.throw('or is currently not supported by JSON-API')
 
 
