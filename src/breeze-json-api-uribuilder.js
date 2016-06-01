@@ -33,16 +33,16 @@
         queryOptions["filter"] = toWhereODataFragment(entityQuery.wherePredicate);
         queryOptions["sort"] = toOrderFragment(entityQuery.orderByClause);
 
-        if (entityQuery.skipCount) {
-            queryOptions["$skip"] = entityQuery.skipCount;
-        }
+        // if (entityQuery.skipCount) {
+        //     queryOptions["$skip"] = entityQuery.skipCount;
+        // }
 
-        if (entityQuery.takeCount != null) {
-            queryOptions["$top"] = entityQuery.takeCount;
-        }
+        // if (entityQuery.takeCount != null) {
+        //     queryOptions["$top"] = entityQuery.takeCount;
+        // }
 
         queryOptions["include"] = toExpandODataFragment(entityQuery.expandClause);
-        queryOptions["$select"] = toSelectODataFragment(entityQuery.selectClause);
+        //queryOptions["$select"] = toSelectODataFragment(entityQuery.selectClause);
 
         if (entityQuery.inlineCountEnabled) {
             queryOptions["$inlinecount"] = "allpages";
