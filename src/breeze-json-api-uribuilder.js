@@ -94,7 +94,7 @@
             // no validate on expand clauses currently.
             // expandClause.validate(entityType);
             var frag = expandClause.propertyPaths.map(function(pp) {
-                return entityType.clientPropertyPathToServer(pp, "/");
+                return entityType.clientPropertyPathToServer(pp, ".");
             }).join(",");
             return frag;
         }

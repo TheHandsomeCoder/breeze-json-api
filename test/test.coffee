@@ -76,6 +76,8 @@ describe '015. OrderBy', ->
 				it '"firstName, lastName", true returns "people?sort=-firstName,-lastName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName, lastName', true)))).to.equal('people?sort=-firstName,-lastName')
 
 describe '030. Expand', ->
-		describe 'expand single', ->
-				it.only 'expand siblings', -> expect(decodeURIComponent(buildUri(query.expand('siblings')))).to.equal('people?include=siblings')
+		it 'expand siblings', -> expect(decodeURIComponent(buildUri(query.expand('siblings')))).to.equal('people?include=siblings')
+		it 'expand siblings, cousins', -> expect(decodeURIComponent(buildUri(query.expand('siblings,cousins')))).to.equal('people?include=siblings,cousins')
+		it 'expand siblings.pets', -> expect(decodeURIComponent(buildUri(query.expand('siblings.pets')))).to.equal('people?include=siblings.pets')
+		it 'expand siblings.pets, cousins', -> expect(decodeURIComponent(buildUri(query.expand('siblings.pets, cousins')))).to.equal('people?include=siblings.pets,cousins')
 
