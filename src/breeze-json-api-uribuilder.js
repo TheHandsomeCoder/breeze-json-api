@@ -30,7 +30,7 @@
 
         var queryOptions = {};
         var entitiyID = getEntityIDFromWhereFragment(entityQuery.wherePredicate);
-        queryOptions["filter"] = toWhereODataFragment(entityQuery.wherePredicate);
+        queryOptions["filter"] = toWhereFragment(entityQuery.wherePredicate);
         queryOptions["sort"] = toOrderFragment(entityQuery.orderByClause);
 
         // if (entityQuery.skipCount) {
@@ -41,7 +41,7 @@
         //     queryOptions["$top"] = entityQuery.takeCount;
         // }
 
-        queryOptions["include"] = toExpandODataFragment(entityQuery.expandClause);
+        queryOptions["include"] = createExpandFragment(entityQuery.expandClause);
         //queryOptions["$select"] = toSelectODataFragment(entityQuery.selectClause);
 
         if (entityQuery.inlineCountEnabled) {
@@ -62,7 +62,7 @@
             }
         }
 
-        function toWhereODataFragment(wherePredicate) {
+        function toWhereFragment(wherePredicate) {
             if (!wherePredicate) return undefined;
             // validation occurs inside of the toODataFragment call here.
             return wherePredicate.visit({
@@ -89,7 +89,7 @@
             return frag;
         }
 
-        function toExpandODataFragment(expandClause) {
+        function createExpandFragment(expandClause) {
             if (!expandClause) return undefined;
             // no validate on expand clauses currently.
             // expandClause.validate(entityType);
