@@ -35,18 +35,15 @@
  * http://opensource.org/licenses/mit-license.php
  * Author: Ward Bell
  */
-(function (definition) {
+(function(factory) {
     if (typeof breeze === "object") {
-        definition(breeze);
+        factory(breeze);
     } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
-        // CommonJS or Node
-        var b = require('breeze');
-        definition(b);
+        // CommonJS or Node: hard-coded dependency on "breeze"
+        factory(require("breeze-client"));
     } else if (typeof define === "function" && define["amd"]) {
-        // Requirejs / AMD
-        define(['breeze'], definition);
-    } else {
-        throw new Error("Can't find breeze");
+        // AMD anonymous module with hard-coded dependency on "breeze"
+        define(["breeze"], factory);
     }
 }(function (breeze) {
     "use strict";
