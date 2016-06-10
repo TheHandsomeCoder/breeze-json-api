@@ -1,40 +1,7 @@
 /*
- * Breeze Labs Azure Mobile Services DataServiceAdapter
- *
- *  v.0.6.2
- *
- * Registers an Azure Mobile Services DataServiceAdapter with Breeze
- *
  * REQUIRES breeze.labs.dataservice.abstractrest.js v.0.6.0+
- *
- * This adapter cannot get metadata from the server because mobile services does not provide metadata.
- *
- * Typical usage in Angular
- *    // configure breeze to use Azure Mobile Services dataservice adapter
- *    var dsAdapter = breeze.config.initializeAdapterInstance('dataService', 'azure-mobile-services', true);
- *
- *    // provide the mobile services information specific to your app
- *    adapter.mobileServicesInfo = {
- *        url:          'https://yoursite.azure-mobile.net/',
- *        appKey:       'MumboJumboLwepMvaSSJdCAauHzhfddkQC33',    // identifies your app; it is not a secret
- *        installId:    '21463a76-e9fd-e429-13c6-a7a406a70505',    // if you know it, else creates one for you
- *        zumoVersion: 'ZUMO/1.0 (lang=Web; os=--; os_version=--; arch=--; version=1.0.11121.0)' // if you know it
- *    };
- *
- * This adapter has its own JsonResultsAdapter which you could replace.
- *
- * By default this adapter permits multiple entities to be saved at a time,
- * each in a separate request that this adapter fires off in parallel.
- * and waits for all to complete.
- *
- * If 'saveOnlyOne' == true, the adapter throws an exception
- * when asked to save more than one entity at a time.
- *
- * Copyright 2015 IdeaBlade, Inc.  All Rights Reserved.
- * Licensed under the MIT License
- * http://opensource.org/licenses/mit-license.php
- * Author: Ward Bell
- */
+*/
+
 (function(factory) {
     if (typeof breeze === "object") {
         factory(breeze);
@@ -157,8 +124,8 @@
         var adapter = mappingContext.adapter = this;
         mappingContext.entityType = adapter._getEntityTypeFromMappingContext(mappingContext);
         var deferred = adapter.Q.defer();
-        var url = mappingContext.getUrl();       
-        var headers = {};       
+        var url = mappingContext.getUrl();
+        var headers = {};
 
         adapter._ajaxImpl.ajax({
             type: "GET",

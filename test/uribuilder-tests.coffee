@@ -2,9 +2,12 @@ l = console.log
 j = JSON.stringify
 p = (item) -> l(j(item, null, 4))
 
+Q = require('Q')
 breeze = require('breeze-client')
+require('../node_modules/breeze-client-labs/breeze.labs.dataservice.abstractrest')
 require('../src/breeze-json-api-uribuilder.js')
 require('../src/breeze-json-api-adapter.js')
+
 expect = require('chai').expect
 
 uriBuilder = undefined
@@ -15,6 +18,7 @@ buildUri = (query) -> uriBuilder.buildUri query, manager.metadataStore
 before ->
   breeze.config.initializeAdapterInstances uriBuilder: 'json-api'
   breeze.config.initializeAdapterInstances dataService: 'json-api'
+  breeze.config.setQ(Q)
   ds = new (breeze.DataService)(
     serviceName: 'http://localhost:9000'
     hasServerMetadata: false)
@@ -89,4 +93,4 @@ describe '030. Expand', ->
 
 
 describe '040. Execute Query', ->
-  it 'executeQuery', -> expect(manager.executeQuery(query)).to.equal(true)
+  it 'executeQuery', -> expect(manager.executeQuery(query)).to.equal({state: 'pending'})
