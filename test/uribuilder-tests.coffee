@@ -2,17 +2,20 @@ l = console.log
 j = JSON.stringify
 p = (item) -> l(j(item, null, 4))
 
-Q = require('Q')
+Q = require('q')
+jQuery = require('jquery')
 breeze = require('breeze-client')
 require('../node_modules/breeze-client-labs/breeze.labs.dataservice.abstractrest')
 require('../src/breeze-json-api-uribuilder.js')
 require('../src/breeze-json-api-adapter.js')
+sinon = require('sinon')
 
 expect = require('chai').expect
 
 uriBuilder = undefined
 manager = undefined
 query = undefined
+fakeServer = undefined
 buildUri = (query) -> uriBuilder.buildUri query, manager.metadataStore
 
 before ->
@@ -92,5 +95,17 @@ describe '030. Expand', ->
     it 'expand siblings.pets, cousins', -> expect(decodeURIComponent(buildUri(query.expand('siblings.pets, cousins')))).to.equal('people?include=siblings.pets,cousins')
 
 
+before ->
+  breeze.config.setQ(Q)
+  console.log("Q set")
+  fakeServer = sinon.fakeServer.create();
+  fakeServer.autoRespond
+  fakeServer.respondWith("GET", "/some/article/comments.json",
+    [200, { "Content-Type": "application/json" },
+      '[{ "id": 12, "comment": "Hey there" }]']);
+
 describe '040. Execute Query', ->
-  it 'executeQuery', -> expect(manager.executeQuery(query)).to.equal({state: 'pending'})
+    it 'executeQuery', ->
+        manager.executeQuery(query).then((data) ->
+            console.log("lol")
+    )

@@ -123,7 +123,7 @@
     function executeQuery(mappingContext) {
         var adapter = mappingContext.adapter = this;
         mappingContext.entityType = adapter._getEntityTypeFromMappingContext(mappingContext);
-        var deferred = adapter.Q.defer();
+        var deferred = breeze.Q.defer();
         var url = mappingContext.getUrl();
         var headers = {};
 
