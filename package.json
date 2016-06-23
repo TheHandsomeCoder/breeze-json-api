@@ -28,10 +28,14 @@
   "devDependencies": {
     "breeze-client": "^1.5.6",
     "chai": "^3.5.0",
+    "chai-as-promised": "^5.3.0",
     "coffee-script": "^1.10.0",
+    "jquery": "^3.0.0",
+    "jsdom": "^9.2.1",
     "mocha": "^2.4.5",
     "phantomjs": "^2.1.7",
     "q": "^1.4.1",
+    "request-promise": "^3.0.0",
     "sinon": "^1.17.4"
   }
 }

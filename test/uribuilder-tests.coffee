@@ -3,7 +3,9 @@ j = JSON.stringify
 p = (item) -> l(j(item, null, 4))
 
 Q = require('q')
-jQuery = require('jquery')
+
+
+
 breeze = require('breeze-client')
 require('../node_modules/breeze-client-labs/breeze.labs.dataservice.abstractrest')
 require('../src/breeze-json-api-uribuilder.js')
@@ -96,8 +98,10 @@ describe '030. Expand', ->
 
 
 before ->
-  breeze.config.setQ(Q)
-  console.log("Q set")
+  require('jsdom').env '', (err, window) ->
+  if err
+    console.error err
+  $ = require('jquery')(window)
   fakeServer = sinon.fakeServer.create();
   fakeServer.autoRespond
   fakeServer.respondWith("GET", "/some/article/comments.json",
@@ -105,7 +109,7 @@ before ->
       '[{ "id": 12, "comment": "Hey there" }]']);
 
 describe '040. Execute Query', ->
-    it 'executeQuery', ->
+    it.only() 'executeQuery', ->
         manager.executeQuery(query).then((data) ->
             console.log("lol")
     )
