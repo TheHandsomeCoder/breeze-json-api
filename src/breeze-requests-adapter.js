@@ -1,5 +1,3 @@
-// jQuery ajax adapter ( JQuery v.>=1.5 )
-// see https://api.jquery.com/jQuery.ajax/
 (function (factory) {
   // Module systems magic dance.
   if (typeof breeze === "object") {
@@ -22,9 +20,10 @@
     this.defaultSettings = { };
     this.requestInterceptor = null;
   };
+
   var proto = ctor.prototype;
 
-  proto.initialize = function () {  
+  proto.initialize = function () {
     rq = require('request-promise');
   };
 
@@ -32,46 +31,20 @@
     if (!rq) {
       throw new Error("Unable to locate requests-promise");
     }
-    var jqConfig = {
-      type: config.type,
-      url: config.url,
-      data: config.params || config.data,
-      dataType: config.dataType,
-      contentType: config.contentType,
-      crossDomain: config.crossDomain,
-      headers: config.headers || {}
-    }
 
-    if (!core.isEmpty(this.defaultSettings)) {
-      var compositeConfig = core.extend({}, this.defaultSettings);
-      jqConfig = core.extend(compositeConfig, jqConfig);
-      // extend is shallow; extend headers separately
-      var headers =core.extend({}, this.defaultSettings.headers); // copy default headers 1st
-      jqConfig.headers = core.extend(headers, jqConfig.headers);
-    }
+    var options = {
+      uri: config.url,
+      method: config.type,
+      headers: config.headers || {},
+      body: config.params || config.data,
+      json: true // Automatically parses the JSON string in the response
+    };
 
-    var requestInfo = {
-      adapter: this,      // this adapter
-      config: jqConfig,   // jQuery's ajax 'settings' object
-      dsaConfig: config,  // the config arg from the calling Breeze DataServiceAdapter
-      success: successFn, // adapter's success callback
-      error: errorFn      // adapter's error callback
-    }
+    rq(options)
+      .then(successFn)
+      .catch(errorFn);
 
-    if (core.isFunction(this.requestInterceptor)) {
-      this.requestInterceptor(requestInfo);
-      if (this.requestInterceptor.oneTime) {
-        this.requestInterceptor = null;
-      }
-    }
-
-    if (requestInfo.config) { // exists unless requestInterceptor killed it.
-      requestInfo.jqXHR = jQuery.ajax(requestInfo.config)
-          .done(requestInfo.success)
-          .fail(requestInfo.error);
-    }
-
-    function successFn(data, statusText, jqXHR) {
+    function successFn(response) {
       var httpResponse = {
         config: config,
         data: data,
@@ -80,11 +53,9 @@
         statusText: statusText
       };
       config.success(httpResponse);
-      jqXHR.onreadystatechange = null;
-      jqXHR.abort = null;
     }
 
-    function errorFn(jqXHR, statusText, errorThrown) {
+    function errorFn(error) {
       var httpResponse = {
         config: config,
         data: jqXHR.responseText,
@@ -94,8 +65,6 @@
         statusText: statusText
       };
       config.error(httpResponse);
-      jqXHR.onreadystatechange = null;
-      jqXHR.abort = null;
     }
   };
 

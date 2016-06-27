@@ -12,7 +12,7 @@ Q = require('q');
 
 breeze = require('breeze-client');
 
-require('../node_modules/breeze-client-labs/breeze.labs.dataservice.abstractrest');
+require('../src/breeze.labs.dataservice.abstractrest');
 
 require('../src/breeze-json-api-uribuilder.js');
 

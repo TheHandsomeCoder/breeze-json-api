@@ -4,8 +4,6 @@ p = (item) -> l(j(item, null, 4))
 
 Q = require('q')
 
-
-
 breeze = require('breeze-client')
 require('../node_modules/breeze-client-labs/breeze.labs.dataservice.abstractrest')
 require('../src/breeze-json-api-uribuilder.js')
