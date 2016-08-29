@@ -1,35 +1,4 @@
-covet = require('covet')
-express = require('express')
-_ = require("underscore")
-request = require('request')
-
-host = process.env.COVET_HOST || "localhost"
-port = process.env.COVET_PORT || 9000
-
-urlFor = (path) ->
-  "http://#{host}:#{port}/#{path}"
-
-handle = (callback) ->
-  (err, res, body) ->
-    callback?(body, res, err)
-
-get = (path, callback) ->
-  request {url: urlFor(path), json: true}, handle(callback)
-
-post = (path, params, callback) ->
-  request.post {url: urlFor(path), json: params}, handle(callback)
-
-put = (path, params, callback) ->
-  request.put {url: urlFor(path), json: params}, handle(callback)
-
-del = (path, callback) ->
-  request.del {url: urlFor(path)}, handle(callback)
-
-
-covet.start
-  app: _(express()).tap (app) ->
-    app.all '*', (req, res) -> res.send(404)
-    app.listen(process.env.COVET_PORT || 9000)
+require './helpers/helper.coffee'
 
 l = console.log
 j = JSON.stringify

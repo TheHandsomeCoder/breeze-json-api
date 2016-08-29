@@ -1,4 +1,6 @@
-
+covet = require('covet')
+express = require('express')
+_ = require("underscore")
 
 root = global
 
@@ -6,9 +8,8 @@ root.expect = require('chai').expect
 
 request = require('request')
 
-
-
-console.log(port)
+host = process.env.COVET_HOST || "localhost"
+port = process.env.COVET_PORT || 9000
 
 urlFor = (path) ->
   "http://#{host}:#{port}/#{path}"
@@ -29,3 +30,7 @@ root.put = (path, params, callback) ->
 root.del = (path, callback) ->
   request.del {url: urlFor(path)}, handle(callback)
 
+covet.start
+  app: _(express()).tap (app) ->
+    app.all '*', (req, res) -> res.send(404)
+    app.listen(process.env.COVET_PORT || 9000)
