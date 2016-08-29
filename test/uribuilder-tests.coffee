@@ -1,3 +1,36 @@
+covet = require('covet')
+express = require('express')
+_ = require("underscore")
+request = require('request')
+
+host = process.env.COVET_HOST || "localhost"
+port = process.env.COVET_PORT || 9000
+
+urlFor = (path) ->
+  "http://#{host}:#{port}/#{path}"
+
+handle = (callback) ->
+  (err, res, body) ->
+    callback?(body, res, err)
+
+get = (path, callback) ->
+  request {url: urlFor(path), json: true}, handle(callback)
+
+post = (path, params, callback) ->
+  request.post {url: urlFor(path), json: params}, handle(callback)
+
+put = (path, params, callback) ->
+  request.put {url: urlFor(path), json: params}, handle(callback)
+
+del = (path, callback) ->
+  request.del {url: urlFor(path)}, handle(callback)
+
+
+covet.start
+  app: _(express()).tap (app) ->
+    app.all '*', (req, res) -> res.send(404)
+    app.listen(process.env.COVET_PORT || 9000)
+
 l = console.log
 j = JSON.stringify
 p = (item) -> l(j(item, null, 4))
@@ -8,6 +41,7 @@ breeze = require('breeze-client')
 require('../node_modules/breeze-client-labs/breeze.labs.dataservice.abstractrest')
 require('../src/breeze-json-api-uribuilder.js')
 require('../src/breeze-json-api-adapter.js')
+require('../src/breeze-requests-adapter.js')
 sinon = require('sinon')
 
 expect = require('chai').expect
@@ -15,12 +49,12 @@ expect = require('chai').expect
 uriBuilder = undefined
 manager = undefined
 query = undefined
-fakeServer = undefined
 buildUri = (query) -> uriBuilder.buildUri query, manager.metadataStore
 
 before ->
   breeze.config.initializeAdapterInstances uriBuilder: 'json-api'
   breeze.config.initializeAdapterInstances dataService: 'json-api'
+  breeze.config.initializeAdapterInstance('ajax', 'breeze-request-adapter', true); 
   breeze.config.setQ(Q)
   ds = new (breeze.DataService)(
     serviceName: 'http://localhost:9000'
@@ -95,19 +129,22 @@ describe '030. Expand', ->
     it 'expand siblings.pets, cousins', -> expect(decodeURIComponent(buildUri(query.expand('siblings.pets, cousins')))).to.equal('people?include=siblings.pets,cousins')
 
 
-before ->
-  require('jsdom').env '', (err, window) ->
-  if err
-    console.error err
-  $ = require('jquery')(window)
-  fakeServer = sinon.fakeServer.create();
-  fakeServer.autoRespond
-  fakeServer.respondWith("GET", "/some/article/comments.json",
-    [200, { "Content-Type": "application/json" },
-      '[{ "id": 12, "comment": "Hey there" }]']);
+before (done) ->
+    post 'covet/routes',
+      verb: 'get'
+      path: '/people'
+      response:
+        json:
+           id: 3
+           name: "Frank"
+           age: 12
+      , (body, res) ->
+      done()
 
+
+ 
 describe '040. Execute Query', ->
-    it.only() 'executeQuery', ->
+    it 'executeQuery', ->
         manager.executeQuery(query).then((data) ->
             console.log("lol")
     )

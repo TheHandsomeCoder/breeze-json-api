@@ -37,7 +37,9 @@
       method: config.type,
       headers: config.headers || {},
       body: config.params || config.data,
-      json: true // Automatically parses the JSON string in the response
+      json: true, // Automatically parses the JSON string in the response
+      simple: false,
+      resolveWithFullResponse: true
     };
 
     rq(options)
@@ -47,10 +49,10 @@
     function successFn(response) {
       var httpResponse = {
         config: config,
-        data: data,
-        getHeaders: getHeadersFn(jqXHR),
-        status: jqXHR.status,
-        statusText: statusText
+        data: response.body,
+        getHeaders: getHeadersFn(response),
+        status: response.statusCode,
+        statusText: response.statusMessage
       };
       config.success(httpResponse);
     }
@@ -58,26 +60,25 @@
     function errorFn(error) {
       var httpResponse = {
         config: config,
-        data: jqXHR.responseText,
-        error: errorThrown,
-        getHeaders: getHeadersFn(jqXHR),
-        status: jqXHR.status,
-        statusText: statusText
+        data: response.body,
+        getHeaders: getHeadersFn(response),
+        status: response.statusCode,
+        statusText: response.statusMessage
       };
       config.error(httpResponse);
     }
   };
 
-  function getHeadersFn(jqXHR) {
-    if (jqXHR.status === 0) { // timeout or abort; no headers
+  function getHeadersFn(response) {
+    if (response.status === 0) { // timeout or abort; no headers
       return function (headerName) {
         return (headerName && headerName.length > 0) ? "" : {};
       };
     } else { // jqXHR should have header functions
       return function (headerName) {
         return (headerName && headerName.length > 0) ?
-               jqXHR.getResponseHeader(headerName) :
-               jqXHR.getAllResponseHeaders();
+               response.getResponseHeader(headerName) :
+               response.getAllResponseHeaders();
       };
     }
   }
