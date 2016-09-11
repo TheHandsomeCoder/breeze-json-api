@@ -42,7 +42,7 @@
         // }
 
         queryOptions["include"] = createExpandFragment(entityQuery.expandClause);
-        //queryOptions["$select"] = toSelectODataFragment(entityQuery.selectClause);
+        queryOptions["$select"] = toSelectODataFragment(entityQuery.selectClause);
 
         if (entityQuery.inlineCountEnabled) {
             queryOptions["$inlinecount"] = "allpages";
