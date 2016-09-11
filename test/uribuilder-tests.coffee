@@ -76,7 +76,7 @@ describe '015. OrderBy', ->
     describe 'orderBy single', ->
         it '"firstName" returns "people?sort=firstName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName')))).to.equal('people?sort=firstName')
         it '"firstName desc" returns "people?sort=-firstName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName desc')))).to.equal('people?sort=-firstName')
-        it '"firstName desc", false" returns "people?sort=firstName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName desc', false)))).to.equal('people?sort=firstName')
+        it '"firstName desc", false returns "people?sort=firstName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName desc', false)))).to.equal('people?sort=firstName')
         it '"firstName, true" returns "people?sort=-firstName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName', true)))).to.equal('people?sort=-firstName')
 
     describe 'orderBy multiple', ->
@@ -87,7 +87,7 @@ describe '015. OrderBy', ->
         it '"firstName desc, lastName desc", false returns "people?sort=firstName,lastName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName desc, lastName desc', false)))).to.equal('people?sort=firstName,lastName')
         it '"firstName, lastName", true returns "people?sort=-firstName,-lastName"', -> expect(decodeURIComponent(buildUri(query.orderBy('firstName, lastName', true)))).to.equal('people?sort=-firstName,-lastName')
 
-describe '020. Select', ->
+describe.only '020. Select', ->
     it 'should return fields[people]=firstName when query.select("firstName")', -> expect(decodeURIComponent(buildUri(query.select('firstName')))).to.equal('people?fields[people]=firstName')
     it 'should return fields[people]=firstName,lastName when query.select("firstName, lastName")', -> expect(decodeURIComponent(buildUri(query.select('firstName')))).to.equal('people?fields[people]=firstName,lastName')
 
